@@ -1,55 +1,55 @@
 //IMPORT LIBRARIES
-const { Model, Dataypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 
 //IMPORT DB CONNECTION FROM CONFIG - CONNECTION.JS
-const sequelize = require('../config/connection.js');
+const sequelize = require('../config/connection');
 
 //INITIALIZE USER MODEL - EXTEND OFF SEQUELIZE'S MODEL CLASS
-class User extends Model { }
+class User extends Model {}
 
 //SET UP USER MODEL RULES
 User.init(
     {
-        //COLUMNS
-        //ID COLUMN
-        id: {
-            //SEQUELIZE DATATYPES OBJECT
-            type: DataTypes.INTEGER,
-            //SQL NOT NULL:
-            allowNull: false,
-            //SQL PRIMARY KEY:
-            primaryKey: true,
-            //SQL AUTO INCREMENT:
-            autoIncrement: true
-        },
+       //COLUMNS 
+       //ID COLUMN
+       id: {
+           //SEQUELIZE DATATYPES OBJECT
+           type: DataTypes.INTEGER,
+           //SQL NOT NULL:
+           allowNull: false,
+           //SQL PRIMARY KEY:
+           primaryKey: true,
+           //SQL AUTO INCREMENT:
+           autoIncrement: true
+       },
 
-        //USERNAME COLUMN
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
+       //USERNAME COLUMN
+       username: {
+           type: DataTypes.STRING,
+           allowNull: false
+       },
 
-        //EMAIL COLUMN
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            //NO DUPLICATE EMAILS RULE
-            unique: true,
-            //IF ALLOWNULL = FALSE THEN DATA CAN BE VALIDATED
-            validate: {
+       //EMAIL COLUMN
+       email: {
+           type: DataTypes.STRING,
+           allowNull: false,
+           //NO DUPLICATE EMAILS RULE
+           unique: true,
+           //IF ALLOWNULL = FALSE THEN DATA CAN BE VALIDATED
+           validate: {
                 isEmail: true
-            }
-        },
-        //PASSWORD COLUMN
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                //SET A PASSWORD LENGTH RULE
-                len: [4]
-            }
-        }
-    }, 
+           }          
+       },
+       //PASSWORD COLUMN
+       password: {
+           type: DataTypes.STRING,
+           allowNull: false,
+           validate: {
+               //SET A PASSWORD LENGTH RULE
+               len: [4]
+           }
+       }
+    },
     {
         //TABLE CONFIG OPTIONS
         //SEQUELIZE CONNECTION
