@@ -2,6 +2,7 @@
 
 const User = require('./User');
 const Post = require('./Post');
+const Rate = require('./Rate');
 
 //LINK ASSOCIATIONS
 User.hasMany(Post, {
@@ -12,5 +13,35 @@ Post.belongsTo(User, {
     foreignKey: 'user_id',
 });
 
-//EACH CONSTANT ADDED ABOVE TO BE REQUIRED IS ADDED TO THE ARRAY INSIDE THE CURLY BRACKETS BELOW
-module.exports = { User, Post };
+//THE .BELONGSTOMANY() METHOD FOR THE MANY : MANY RELATIONSHIP OF MANY USERS VOTING ON MANY POSTS
+User.belongsToMany(Post, {
+    through: Rate,
+    as: 'rated_posts',
+    foreignKey: 'user_id'
+});
+
+Post.belongsToMany(User, {
+    through: Rate,
+    as: 'rated_posts',
+    foreignKey: 'post_id'
+});
+
+//TO SEE A TOTAL COUNT OF RATINGS FOR A SINGLE POST AND OTHER FUNCTIONS CALLED AGGREGATED SQL FUNCTIONS BETWEEN MODELS, WE NEED ONE: MANY RELATIONSHIPS DEFINED
+Rate.belongsTo(User, {
+    foreignKey: 'user_id'
+});
+
+Rate.belongsTo(Post, {
+    foreignKey: 'post_id'
+});
+
+User.hasMany(Rate, {
+    foreignKey: 'user_id'
+});
+
+Post.hasMany(Rate, {
+    foreignKey: 'post_id'
+});
+
+//EACH CONSTANT ADDED ABOVE TO BE REQUIRED IS ADDED TO THE ARRAY INSIDE THE CURLY BRACKETS BELOW IN ORDER TO EXPORT EVERYTHING WE IMPORTED AFTER TRANSFORMING THEM.
+module.exports = { User, Post, Rate };
