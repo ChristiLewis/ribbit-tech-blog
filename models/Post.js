@@ -4,8 +4,8 @@ const sequelize = require('../config/connection');
 
 //CREATE POST MODEL
 class Post extends Model {
-    static upvote(body, models) {
-        return models.Vote.create({
+    static uprate(body, models) {
+        return models.Rate.create({
             user_id: body.user_id,
             post_id: body.post_id
         }).then(() => {
@@ -19,8 +19,8 @@ class Post extends Model {
                     'title',
                     'created_at',
                     [
-                        sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),
-                        'vote_count'
+                        sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'),
+                        'rate_count'
                     ]
                 ]
             });
@@ -54,13 +54,14 @@ Post.init({
     },
     user_id: {
         type: DataTypes.INTEGER,
-        references: {
+        allowNull: false,
+        reference: {
             //REFERENCES THE MODELS/USER.JS FILE TO SET THE KEY ID OF THE USER MAKING THE POST
             model: 'user',
             //SQL FOREIGN KEY
             key: 'id'
         }
-    }
+    },
 },
     //SECOND PARAMETER DEFINE THE METADATA
     {

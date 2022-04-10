@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { User, Post, Vote } = require("../../models");
+const { User, Post, Rate } = require("../../models");
 
 /*
 const { Router } = require("express");
@@ -44,7 +44,7 @@ router.get('/:id', (req, res) => {
             {
                 model: Post,
                 attributes: ['title'],
-                through: Vote,
+                through: Rate,
                 as: 'rated_posts'
             }
         ]
