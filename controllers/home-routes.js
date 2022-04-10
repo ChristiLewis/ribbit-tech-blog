@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 //IMPORT MODULES AND MODELS-NOTE LEAVE OUT COMMENT MODEL TO ADD IN LATER const { Post, User, Comment } = require('../models');
 const sequelize = require('../config/connection');
-const { Post, User } = require('../models');
+const { Post, User, Comment, Rate } = require('../models');
 
 router.get('/', (req, res) => {
   console.log(req.session);
@@ -75,10 +75,10 @@ router.get('/post/:id', (req, res) => {
         return;
       }
 
-      // serialize the data
+      //SERIALIZE TO PERSIST IN STORAGE, TRANSFER, AND DISTRIBUTE
       const post = dbPostData.get({ plain: true });
 
-      // pass data to template
+      // PASS DATA TO TEMPLATE
       res.render('single-post', { post });
     })
     .catch(err => {
