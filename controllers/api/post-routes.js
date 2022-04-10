@@ -2,22 +2,34 @@
 const sequelize = require('../../config/connection');
 //ADD LIBRARIES
 const router = require('express').Router();
-const { Post, User, Rate } = require('../../models');
+const { Post, User, Rate, Comment } = require('../../models');
 
 //POST TO GET ALL
 router.get('/', (req, res) => {
     Post.findAll({
-        attributes: ['id', 'post_url', 'title', 'created_at',
-            [sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'), 'rate_count']
-        ],
         //ADD THE ORDER PROPERTY SO THE MOST CURRENT POSTS SHOW FIRST
         order: [
             ['created_at', 'DESC']
         ],
-        include: [{
-            model: User,
-            attributes: ['username']
-        }]
+        attributes: ['id', 'post_url', 'title', 'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
+        ],
+
+        include: [
+            // MODELS TO BE INCLUDED
+            {
+                model: Comment,
+                attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+                include: {
+                    model: User,
+                    attributes: ['username']
+                }
+            },
+            {
+                model: User,
+                attributes: ['username']
+            }
+        ]
     })
         .then(dbPostData => res.json(dbPostData))
         .catch(err => {
