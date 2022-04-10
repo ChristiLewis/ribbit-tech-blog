@@ -1,3 +1,5 @@
+//IMPORT CONNECTION TO THE DB
+const sequelize = require('../../config/connection');
 //ADD LIBRARIES
 const router = require('express').Router();
 const { Post, User, Rate } = require('../../models');
@@ -64,12 +66,34 @@ router.post('/', (req, res) => {
 //UPRATE BETWEEN ROUTER.POST AND /:ID PUT ROUTES
 //PUT/API/POSTS/UPRATE
 router.put('/uprate', (req, res) => {
-    Vote.create({
+    Rate.create({
         user_id: req.body.user_id,
         post_id: req.body.post_id
-    })
-        .then(dbPostData => res.json(dbPostData))
-        .catch(err => res.json(err));
+    }).then(() => {
+        //FIND RATED ON POST
+        return Post.findOne({
+            where: {
+                id: req.body.post_id
+            },
+            attributes: [
+                'id',
+                'post_url',
+                'title',
+                'created_at',
+                //USE MYSQL QUERY TO GET RATE COUNT UNDER VAR NAME RATE_COUNT
+                [
+                    sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'),
+                    'rate_count',
+                ]
+            ]
+        })
+            .then(dbPostData => res.json(dbPostData))
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+
+            });
+    });
 });
 
 router.put('/:id', (req, res) => {
