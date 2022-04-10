@@ -7,7 +7,9 @@ const { Post, User, Rate } = require('../../models');
 //POST TO GET ALL
 router.get('/', (req, res) => {
     Post.findAll({
-        attributes: ['id', 'post_url', 'title', 'created_at'],
+        attributes: ['id', 'post_url', 'title', 'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'), 'rate_count']
+        ],
         //ADD THE ORDER PROPERTY SO THE MOST CURRENT POSTS SHOW FIRST
         order: [
             ['created_at', 'DESC']
@@ -30,7 +32,9 @@ router.get('/:id', (req, res) => {
         where: {
             id: req.params.id
         },
-        attributes: ['id', 'post_url', 'title', 'created_at'],
+        attributes: ['id', 'post_url', 'title', 'created_at',
+            [sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'), 'rate_count']
+        ],
         include: [{
             model: User,
             attributes: ['username']
@@ -65,35 +69,14 @@ router.post('/', (req, res) => {
 
 //UPRATE BETWEEN ROUTER.POST AND /:ID PUT ROUTES
 //PUT/API/POSTS/UPRATE
-router.put('/uprate', (req, res) => {
-    Rate.create({
-        user_id: req.body.user_id,
-        post_id: req.body.post_id
-    }).then(() => {
-        //FIND RATED ON POST
-        return Post.findOne({
-            where: {
-                id: req.body.post_id
-            },
-            attributes: [
-                'id',
-                'post_url',
-                'title',
-                'created_at',
-                //USE MYSQL QUERY TO GET RATE COUNT UNDER VAR NAME RATE_COUNT
-                [
-                    sequelize.literal('(SELECT COUNT(*) FROM rate WHERE post.id = rate.post_id)'),
-                    'rate_count',
-                ]
-            ]
-        })
-            .then(dbPostData => res.json(dbPostData))
-            .catch(err => {
-                console.log(err);
-                res.status(400).json(err);
-
-            });
-    });
+router.put('/upvote', (req, res) => {
+    //REFACTORED METHOD- CUSTOM & STATIC - FROM MODELS/POST.JS
+    Post.upvote(req.body, { Vote })
+        .then(updatedPostData => res.json(updatedPostData))
+        .catch(err => {
+            console.log(err);
+            res.status(400).json(err);
+        });
 });
 
 router.put('/:id', (req, res) => {
