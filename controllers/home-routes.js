@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 //IMPORT MODULES AND MODELS-NOTE LEAVE OUT COMMENT MODEL TO ADD IN LATER const { Post, User, Comment } = require('../models');
 const sequelize = require('../config/connection');
-const { Post, User } = require('../models');
+const { Post, User, Comment, Rate } = require('../models');
 
 router.get('/', (req, res) => {
   console.log(req.session);
@@ -34,7 +34,11 @@ router.get('/', (req, res) => {
       // pass a single post object into the homepage template
       //MAKE AN ARRAY OF THE JAVASCRIPT OBJECTS FOR HANDLEBARS TO USE
       const posts = dbPostData.map(post => post.get({ plain: true }));
-      res.render('homepage', { posts });
+      //CONDITIONALLY RENDER
+      res.render('homepage', {
+        posts,
+        loggedIn: req.session.loggedIn
+      });
     })
     .catch(err => {
       console.log(err);
@@ -75,11 +79,14 @@ router.get('/post/:id', (req, res) => {
         return;
       }
 
-      // serialize the data
+      //SERIALIZE TO PERSIST IN STORAGE, TRANSFER, AND DISTRIBUTE
       const post = dbPostData.get({ plain: true });
 
-      // pass data to template
-      res.render('single-post', { post });
+      // PASS DATA TO TEMPLATE
+      res.render('single-post', {
+        post,
+        loggedIn: req.session.loggedIn
+      });
     })
     .catch(err => {
       console.log(err);

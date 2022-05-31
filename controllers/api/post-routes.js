@@ -82,13 +82,16 @@ router.post('/', (req, res) => {
 //UPRATE BETWEEN ROUTER.POST AND /:ID PUT ROUTES
 //PUT/API/POSTS/UPRATE
 router.put('/uprate', (req, res) => {
-    //REFACTORED METHOD- CUSTOM & STATIC - FROM MODELS/POST.JS
-    Post.uprate(req.body, { Rate })
-        .then(updatedPostData => res.json(updatedPostData))
-        .catch(err => {
-            console.log(err);
-            res.status(400).json(err);
-        });
+    // IF SESSIONS EXIST
+    if (req.session) {
+        // PASS-IN SESSION AND DESTRUCTURED PROPERTIES
+        Post.upvote({ ...req.body, user_id: req.session.user_id }, { Vote, Comment, User })
+            .then(updatedVoteData => res.json(updatedVoteData))
+            .catch(err => {
+                console.log(err);
+                res.status(500).json(err);
+            });
+    }
 });
 
 router.put('/:id', (req, res) => {
